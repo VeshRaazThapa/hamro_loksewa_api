@@ -30,7 +30,7 @@ with open(os.path.join(BASE_DIR, 'secret_key.txt')) as f:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (os.environ.get('DJANGO_DEBUG', 'True') == 'True')
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost','hamroloksewa.com']
 
 
 # Application definition
