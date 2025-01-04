@@ -95,9 +95,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 SPECTACULAR_SETTINGS = {
@@ -118,14 +118,21 @@ if (os.environ.get('DJANGO_DEBUG', 'True') == 'True'):
 else:
     TEMPLATES = [prod_template_config]
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
+#         'HOST': os.environ.get("SQL_HOST", "localhost"),
+#         'NAME': os.environ.get("SQL_PASSWORD", "postgres"),
+#         'PASSWORD': os.environ.get("SQL_PASSWORD", "postgres"),
+#         'PORT': os.environ.get("SQL_PORT", "5432"),
+#         'USER': os.environ.get("SQL_USER", "postgres"),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
-        'HOST': os.environ.get("SQL_HOST", "localhost"),
-        'NAME': os.environ.get("SQL_PASSWORD", "postgres"),
-        'PASSWORD': os.environ.get("SQL_PASSWORD", "postgres"),
-        'PORT': os.environ.get("SQL_PORT", "5432"),
-        'USER': os.environ.get("SQL_USER", "postgres"),
+        'ENGINE': os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        'NAME': os.environ.get("SQL_NAME", os.path.join(BASE_DIR, "db.sqlite3")),
     }
 }
 

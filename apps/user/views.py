@@ -13,7 +13,7 @@ from rest_framework.decorators import permission_classes
     partial_update=extend_schema(description="Partially update a user profile"),
     destroy=extend_schema(description="Delete a user profile")
 )
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
@@ -26,7 +26,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     partial_update=extend_schema(description="Partially update a user role"),
     destroy=extend_schema(description="Delete a user role")
 )
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 class UserRoleViewSet(viewsets.ModelViewSet):
     queryset = UserRole.objects.all()
     serializer_class = UserRoleSerializer
