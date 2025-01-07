@@ -30,7 +30,7 @@ with open(os.path.join(BASE_DIR, 'secret_key.txt')) as f:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (os.environ.get('DJANGO_DEBUG', 'True') == 'True')
 
-ALLOWED_HOSTS = ['localhost','hamroloksewa.com']
+ALLOWED_HOSTS = ['localhost','hamroloksewa.com','127.0.0.1']
 
 
 # Application definition
@@ -50,18 +50,12 @@ INNER_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    # 'gettext',
-    # 'phonenumber_field',
-    # 'ckeditor',
-    # 'celery',
-    # 'ckeditor_uploader',
-    # 'django_celery_beat',
-    # 'django_celery_results',
     'rest_framework',
     'drf_spectacular',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    # 'rest_framework_swagger',
+        'corsheaders',
+
 ]
 
 INSTALLED_APPS += THIRD_PARTY_APPS
@@ -77,6 +71,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     # 'cms.middleware.user.CurrentUserMiddleware',
     # 'cms.middleware.page.CurrentPageMiddleware',
     # 'cms.middleware.toolbar.ToolbarMiddleware',
@@ -88,10 +84,9 @@ FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    # 'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],

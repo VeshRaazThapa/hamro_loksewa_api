@@ -20,7 +20,7 @@ def logout_view(request):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
+## TODO: Complete Passwrod reset
 # Password Reset (Send Email)
 @api_view(['POST'])
 def password_reset(request):
