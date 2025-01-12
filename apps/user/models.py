@@ -67,7 +67,7 @@ class UserFieldOfInterests(models.Model):
         unique_together = ('user', 'areas_of_preparation')  # Ensure no duplicate entries
 
     def __str__(self):
-        return f"{self.user.username} - {self.field_of_interest.name}"
+        return f"{self.user.username} - {self.areas_of_preparation.name}"
     
 class UserRole(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="roles", on_delete=models.CASCADE)

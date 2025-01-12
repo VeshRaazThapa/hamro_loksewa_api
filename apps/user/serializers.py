@@ -40,6 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    areas_of_preparation = serializers.ListField(child=serializers.IntegerField(), write_only=True)
 
     class Meta:
         model = UserProfile
@@ -48,17 +49,33 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         phone_directory = validated_data.get('phone_directory')
-        print(phone_directory)
+        areas_of_preparation_ids = validated_data.pop('areas_of_preparation', [])
+
         # If phone_directory is provided, extract the username from it
         if phone_directory:
-            # phone_directory = PhoneDirectory.objects.get(id=phone_directory_id)
-            username_from_phone = phone_directory.phone  # Assuming 'username' is a field in PhoneDirectory
+            username_from_phone = phone_directory.phone
 
             # Update user_data to include the username from phone directory
             user_data['username'] = username_from_phone
 
+        # Create the user using the updated user_data
         user = UserSerializer().create(user_data)
+
+        # Create the user profile with the remaining validated data
         user_profile = UserProfile.objects.create(user=user, **validated_data)
+
+        # Create UserFieldOfInterests entries based on the areas_of_preparation_ids
+        for area_id in areas_of_preparation_ids:
+            try:
+                area_of_preparation = AreasOfPreparations.objects.get(id=area_id)
+                UserFieldOfInterests.objects.create(
+                    user=user,
+                    areas_of_preparation=area_of_preparation
+                )
+            except AreasOfPreparations.DoesNotExist:
+                # Handle the case where the AreasOfPreparations does not exist
+                raise serializers.ValidationError(f"Area of preparation with ID {area_id} does not exist.")
+
         return user_profile
 
 class UserRoleSerializer(serializers.ModelSerializer):
