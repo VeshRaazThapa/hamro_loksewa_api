@@ -22,7 +22,7 @@ class UserProfile(models.Model):
         related_name="profile",
         on_delete=models.CASCADE
     )
-    middle_name = models.CharField(max_length=100, null=True, blank=True)
+    full_name = models.CharField(max_length=100, null=True, blank=True)
     gender = models.CharField(
         max_length=100, choices=GENDER_CHOICES, null=True, blank=True
     )

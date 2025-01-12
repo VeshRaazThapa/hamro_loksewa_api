@@ -10,7 +10,7 @@ from django.urls import path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 # Routers provide a way of automatically determining the URL conf.
 router = routers.DefaultRouter()
-router.register(r'users', UserProfileViewSet)
+router.register(r'users-profile', UserProfileViewSet)
 router.register(r'user-roles',UserRoleViewSet)
 router.register(r'areas-of-preparation',AreasOfPreparationsViewSet)
 router.register(r'user-field-of-interests',UserFieldOfInterestsViewSet)

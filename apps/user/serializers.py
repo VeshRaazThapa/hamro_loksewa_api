@@ -31,7 +31,7 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email", "password"]
+        fields = ["id", "email", "password"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
@@ -47,6 +47,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
+        phone_directory = validated_data.get('phone_directory')
+        print(phone_directory)
+        # If phone_directory is provided, extract the username from it
+        if phone_directory:
+            # phone_directory = PhoneDirectory.objects.get(id=phone_directory_id)
+            username_from_phone = phone_directory.phone  # Assuming 'username' is a field in PhoneDirectory
+
+            # Update user_data to include the username from phone directory
+            user_data['username'] = username_from_phone
+
         user = UserSerializer().create(user_data)
         user_profile = UserProfile.objects.create(user=user, **validated_data)
         return user_profile
