@@ -84,6 +84,12 @@ FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'apps.user.backend.PhoneNumberBackend',  # Use the correct path based on your directory structure
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
 CORS_ALLOW_ALL_ORIGINS = True
 
 REST_FRAMEWORK = {

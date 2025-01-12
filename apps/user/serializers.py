@@ -1,9 +1,33 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
-from .models import AreasOfPreparations, UserFieldOfInterests
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+from .models import AreasOfPreparations, UserFieldOfInterests,PhoneDirectory
+from django.core.exceptions import ValidationError
 
 from .models import UserProfile,UserRole
+
+# login
+class CustomTokenObtainPairSerializer(serializers.Serializer):
+    phone = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, attrs):
+        phone = attrs.get("phone")
+        password = attrs.get("password")
+
+        user = authenticate(phone=phone, password=password)
+
+        if not user:
+            raise serializers.ValidationError("Invalid phone number or password.")
+
+        refresh = RefreshToken.for_user(user)
+        return {
+            'access': str(refresh.access_token),
+            'refresh': str(refresh)
+        }
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -46,6 +70,20 @@ class UserRoleSerializer(serializers.ModelSerializer):
         instance.ended_at = validated_data.get('ended_at', instance.ended_at)
         instance.save()
         return instance
+
+class PhoneDirectorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PhoneDirectory
+        fields = ['phone']
+
+    def validate_phone(self, value):
+        if len(value) < 10:
+            raise ValidationError("Phone number must be at least 10 digits.")
+        return value
+
+class OTPVerificationSerializer(serializers.Serializer):
+    phone = serializers.CharField(max_length=15)
+    otp = serializers.CharField(max_length=6)
 
 # Serializer for AreasOfPreparations
 class AreasOfPreparationsSerializer(serializers.ModelSerializer):

@@ -4,6 +4,13 @@ from django.contrib.auth.models import Group, Permission
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+class PhoneDirectory(models.Model):
+    phone = models.CharField(max_length=15, null=True, blank=True, unique=True)
+    is_verified = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.phone
+
 class UserProfile(models.Model):
     GENDER_CHOICES = [
         ("Male", _("Male")),
@@ -19,10 +26,14 @@ class UserProfile(models.Model):
     gender = models.CharField(
         max_length=100, choices=GENDER_CHOICES, null=True, blank=True
     )
-    phone = models.CharField(max_length=15, null=True, blank=True, unique=True)
+    phone_directory =  models.ForeignKey(
+        PhoneDirectory,
+        related_name="users",
+        on_delete=models.SET_NULL,
+        null=True,blank=True
+    )
     address = models.CharField(max_length=255, null=True, blank=True)
     dob = models.DateTimeField(null=True, blank=True)
-    phone_number_is_verified = models.BooleanField(default=False)
     experience_in_yrs = models.PositiveIntegerField(null=True, blank=True)
     profile_photo_url = models.ImageField(upload_to="user/profile/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -30,7 +41,7 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
-
+    
 class AreasOfPreparations(models.Model):
     name = models.CharField(max_length=255)
     icon_name = models.CharField(max_length=255)

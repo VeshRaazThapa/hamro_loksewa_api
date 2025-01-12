@@ -6,14 +6,21 @@ from apps.user.views import UserProfileViewSet,UserRoleViewSet,AreasOfPreparatio
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from ..views import auth as auth_views
 from .auth import auth_urlpatterns
+from django.urls import path
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 # Routers provide a way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'users', UserProfileViewSet)
 router.register(r'user-roles',UserRoleViewSet)
 router.register(r'areas-of-preparation',AreasOfPreparationsViewSet)
 router.register(r'user-field-of-interests',UserFieldOfInterestsViewSet)
+
 urlpatterns = [
     path('', include(router.urls)),
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+
     path('admin/', admin.site.urls),  # Admin URL
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
