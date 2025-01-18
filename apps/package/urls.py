@@ -1,18 +1,22 @@
-from django.contrib.auth.decorators import login_required
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import (
+    ProvinceViewSet, AssociationViewSet, PackageCategoryViewSet,
+    PackageSubCategoryViewSet, PackageViewSet, UserPackageViewSet,
+    SubscriptionViewSet, UserSubscriptionViewSet, PaymentViewSet,
+)
 
-from .views import *
+router = DefaultRouter()
+router.register(r'provinces', ProvinceViewSet)
+router.register(r'associations', AssociationViewSet)
+router.register(r'package-categories', PackageCategoryViewSet)
+router.register(r'package-subcategories', PackageSubCategoryViewSet)
+router.register(r'packages', PackageViewSet)
+router.register(r'user-packages', UserPackageViewSet)
+router.register(r'subscriptions', SubscriptionViewSet)
+router.register(r'user-subscriptions', UserSubscriptionViewSet)
+router.register(r'payments', PaymentViewSet)
 
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
-urlpatterns = [
-    path('assign-role/', AssignUserRole.as_view(), name="assign-user-role"),
-    path('unassign-role/<int:pk>', UnassignUserRole.as_view(), name="unassign-user-role"),
-    path('role/list/', ListUserRole.as_view(), name="user-roles-list"),
-    path('add/', login_required(create_user), name="create-user"),
-    path('list/', UserList.as_view(), name="user-list"),
-
-    path('edit-status/<int:pk>', edit_user_status, name="user-status-edit"),
-    path('profile/edit', EditUserProfile.as_view(), name="profile-edit"),
-    path('delete/<int:pk>', DeleteUser.as_view(), name="delete-user"),
+package_urlpatterns = [
+    path('', include(router.urls)),
 ]

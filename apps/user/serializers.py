@@ -16,17 +16,45 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
     def validate(self, attrs):
         phone = attrs.get("phone")
         password = attrs.get("password")
+        data = super().validate(attrs)
 
         user = authenticate(phone=phone, password=password)
 
+        try:
+            user_profile = UserProfile.objects.get(user=user)
+            try:
+                user_role = UserRole.objects.get(user=user)
+            except UserRole.DoesNotExist:
+                user_role=None
+
+            user_profile_data = {
+                "id": user_profile.id,
+                "user_id": user_profile.user.id,
+                "email": user.email,
+                "full_name": user_profile.full_name,
+                "gender": user_profile.gender,
+                "phone": user_profile.phone if hasattr(user_profile, 'phone') else None,
+                "address": user_profile.address,
+                "role": user_role.name if user_role else None,
+                "dob": user_profile.dob,
+                "experience_in_yrs": user_profile.experience_in_yrs,
+                "profile_photo_url": user_profile.profile_photo_url.url if user_profile.profile_photo_url and hasattr(user_profile.profile_photo_url, 'url') else None,
+                "created_at": user_profile.created_at,
+                "updated_at": user_profile.updated_at,
+            }
+        except UserProfile.DoesNotExist:
+            user_profile_data = {}
+
+        # Add user profile data to the response
+        data["user_profile"] = user_profile_data
         if not user:
             raise serializers.ValidationError("Invalid phone number or password.")
 
         refresh = RefreshToken.for_user(user)
-        return {
-            'access': str(refresh.access_token),
-            'refresh': str(refresh)
-        }
+        data['access'] = str(refresh.access_token)
+        data['refresh'] = str(refresh)
+
+        return data
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

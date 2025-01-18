@@ -10,6 +10,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 from ..views import auth as auth_views
 from .auth import auth_urlpatterns
 from django.urls import path
+from apps.package.urls import package_urlpatterns
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 # Routers provide a way of automatically determining the URL conf.
 router = routers.DefaultRouter()
@@ -32,4 +33,5 @@ urlpatterns = [
 ]
 # login URLs for the browsable API.
 urlpatterns += auth_urlpatterns
+urlpatterns += package_urlpatterns
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

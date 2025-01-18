@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
-
+from django.conf import settings
 from django.db import models
-
+from apps.user.models import AreasOfPreparations
 class Province(models.Model):
     name = models.CharField(max_length=255, null=False)
 
@@ -37,7 +37,11 @@ class PackageSubCategory(models.Model):
 
 class Package(models.Model):
     title = models.CharField(max_length=255, null=False)
-    areas_of_preparation_id = models.IntegerField()  # Replace with ForeignKey if related table exists
+    areas_of_preparation = models.ForeignKey(
+            AreasOfPreparations,
+            related_name="packages",
+            on_delete=models.CASCADE
+    )    
     category = models.ForeignKey(PackageCategory, on_delete=models.CASCADE, related_name='packages')
     sub_category = models.ForeignKey(PackageSubCategory, on_delete=models.CASCADE, related_name='packages')
     price = models.DecimalField(max_digits=10, decimal_places=2, null=False)
@@ -55,7 +59,7 @@ class Package(models.Model):
 
 
 class UserPackage(models.Model):
-    user_id = models.IntegerField()  # Replace with ForeignKey if related table exists
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="packages", on_delete=models.CASCADE)
     package = models.ForeignKey(Package, on_delete=models.CASCADE, related_name='user_packages')
     payment_id = models.IntegerField()  # Replace with ForeignKey if related table exists
     expiry_at = models.DateTimeField(null=False)
@@ -99,7 +103,7 @@ class UserSubscription(models.Model):
         (EXPIRED, 'Expired'),
     ]
 
-    user_id = models.IntegerField()  # Replace with ForeignKey if related table exists
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="subscriptions", on_delete=models.CASCADE)
     subscription_type = models.ForeignKey(Subscription, on_delete=models.CASCADE, related_name='user_subscriptions')
     payment_id = models.IntegerField()  # Replace with ForeignKey if related table exists
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=ACTIVE)
@@ -130,7 +134,7 @@ class Payment(models.Model):
         (KHALTI, 'Khalti'),
     ]
 
-    user_id = models.IntegerField()  # Replace with ForeignKey if related table exists
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="payments", on_delete=models.CASCADE)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=PENDING)
     method = models.CharField(max_length=10, choices=METHOD_CHOICES, null=False)
     created_at = models.DateTimeField(auto_now_add=True)

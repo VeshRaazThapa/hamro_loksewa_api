@@ -46,7 +46,7 @@ INSTALLED_APPS = [
 
 INNER_APPS = [
     'apps.user',
-    # 'apps.encryption',
+    'apps.package',
 ]
 
 THIRD_PARTY_APPS = [
