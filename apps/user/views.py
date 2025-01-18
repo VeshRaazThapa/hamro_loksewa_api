@@ -85,7 +85,7 @@ class SendOTPView(APIView):
 
         # Check if the phone number already exists
         existing_phone = PhoneDirectory.objects.filter(phone=phone).first()
-        if existing_phone.is_verified:
+        if existing_phone and existing_phone.is_verified:
                 return Response({"detail": "Phone number is already verified","phone_directory_id":existing_phone.id}, status=status.HTTP_400_BAD_REQUEST)
         if not existing_phone:
             # Create a new entry if the phone number does not exist

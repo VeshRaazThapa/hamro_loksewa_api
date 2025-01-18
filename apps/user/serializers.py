@@ -60,7 +60,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
         # Create the user using the updated user_data
         user = UserSerializer().create(user_data)
-        user_role = UserRole.objects.create(user=user, group=Group.objects.get(name='student'))
+        user_role = UserRole.objects.create(user=user, group=Group.objects.get(name='Student'))
         print('Created User Role', user_role)
         # Create the user profile with the remaining validated data
         user_profile = UserProfile.objects.create(user=user, **validated_data)
