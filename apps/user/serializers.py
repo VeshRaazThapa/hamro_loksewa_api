@@ -16,7 +16,7 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
     def validate(self, attrs):
         phone = attrs.get("phone")
         password = attrs.get("password")
-        data = super().validate(attrs)
+
 
         user = authenticate(phone=phone, password=password)
 
@@ -33,7 +33,7 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
                 "email": user.email,
                 "full_name": user_profile.full_name,
                 "gender": user_profile.gender,
-                "phone": user_profile.phone if hasattr(user_profile, 'phone') else None,
+                "phone": user_profile.phone_directory.phone if user_profile.phone_directory and hasattr(user_profile.phone_directory, 'phone') else None,
                 "address": user_profile.address,
                 "role": user_role.name if user_role else None,
                 "dob": user_profile.dob,
@@ -44,17 +44,17 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
             }
         except UserProfile.DoesNotExist:
             user_profile_data = {}
-
+        response_data={}
         # Add user profile data to the response
-        data["user_profile"] = user_profile_data
+        response_data["user_profile"] = user_profile_data
         if not user:
             raise serializers.ValidationError("Invalid phone number or password.")
 
         refresh = RefreshToken.for_user(user)
-        data['access'] = str(refresh.access_token)
-        data['refresh'] = str(refresh)
+        response_data['access'] = str(refresh.access_token)
+        response_data['refresh'] = str(refresh)
 
-        return data
+        return response_data
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
