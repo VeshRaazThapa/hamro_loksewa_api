@@ -17,14 +17,13 @@ import random
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-
 @extend_schema_view(
-    list=extend_schema(description="Retrieve list of user profiles"),
-    retrieve=extend_schema(description="Retrieve a single user profile"),
-    create=extend_schema(description="Create a new user profile"),
-    update=extend_schema(description="Update a user profile"),
-    partial_update=extend_schema(description="Partially update a user profile"),
-    destroy=extend_schema(description="Delete a user profile")
+    list=extend_schema(summary="List all users",description="Retrieve list of user profiles"),
+    retrieve=extend_schema(summary="Get a single user profile",description="Retrieve a single user profile"),
+    create=extend_schema(summary="Register a new user",description="Create a new user profile"),
+    update=extend_schema(summary="Update a User Profile",description="Update a user profile"),
+    partial_update=extend_schema(summary="Partially update a user profile",description="Partially update a user profile"),
+    destroy=extend_schema(summary="Delete a user profile",description="Delete a user profile")
 )
 @permission_classes([AllowAny])
 class UserProfileViewSet(viewsets.ModelViewSet):
