@@ -85,18 +85,16 @@ class SendOTPView(APIView):
 
         # Check if the phone number already exists
         existing_phone = PhoneDirectory.objects.filter(phone=phone).first()
+        if existing_phone.is_verified:
+                return Response({"detail": "Phone number is already verified","phone_directory_id":existing_phone.id}, status=status.HTTP_400_BAD_REQUEST)
+        if not existing_phone:
+            # Create a new entry if the phone number does not exist
+            phone_directory = PhoneDirectory.objects.create(phone=phone, is_verified=False)
 
-        if existing_phone:
-            # If phone number exists, return a 400 error with a message
-            return Response({"detail": "Phone number already exists."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Create a new entry if the phone number does not exist
-        phone_directory = PhoneDirectory.objects.create(phone=phone, is_verified=False)
-
-        # Save the dummy OTP (123456) to the PhoneDirectory model
-        # TODO: add otp field in phone directory
-        # phone_directory.otp = "123456"  # Assuming 'otp' is a field in the PhoneDirectory model
-        phone_directory.save()
+            # Save the dummy OTP (123456) to the PhoneDirectory model
+            # TODO: add otp field in phone directory
+            # phone_directory.otp = "123456"  # Assuming 'otp' is a field in the PhoneDirectory model
+            phone_directory.save()
 
         # Return the dummy OTP response
         return Response({"message": "OTP sent.", "otp": "123456"}, status=status.HTTP_200_OK)

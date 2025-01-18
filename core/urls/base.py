@@ -1,5 +1,8 @@
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.contrib import admin
+from django.conf.urls.static import static
+
 from django.urls import include, path
 from rest_framework import routers
 from apps.user.views import UserProfileViewSet,UserRoleViewSet,AreasOfPreparationsViewSet,UserFieldOfInterestsViewSet
@@ -29,3 +32,4 @@ urlpatterns = [
 ]
 # login URLs for the browsable API.
 urlpatterns += auth_urlpatterns
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

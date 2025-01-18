@@ -40,7 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    areas_of_preparation = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    areas_of_preparation = serializers.ListField(child=serializers.IntegerField(), write_only=True,required=False)
 
     class Meta:
         model = UserProfile
@@ -60,7 +60,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
         # Create the user using the updated user_data
         user = UserSerializer().create(user_data)
-
+        user_role = UserRole.objects.create(user=user, group=Group.objects.get(name='student'))
+        print('Created User Role', user_role)
         # Create the user profile with the remaining validated data
         user_profile = UserProfile.objects.create(user=user, **validated_data)
 
@@ -116,7 +117,7 @@ class OTPVerificationSerializer(serializers.Serializer):
 class AreasOfPreparationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = AreasOfPreparations
-        fields = ['id', 'name', 'icon_name', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'icon', 'created_at', 'updated_at']
 
 # Serializer for UserFieldOfInterests
 class UserFieldOfInterestsSerializer(serializers.ModelSerializer):
