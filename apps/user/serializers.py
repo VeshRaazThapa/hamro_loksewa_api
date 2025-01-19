@@ -35,7 +35,7 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
                 "gender": user_profile.gender,
                 "phone": user_profile.phone_directory.phone if user_profile.phone_directory and hasattr(user_profile.phone_directory, 'phone') else None,
                 "address": user_profile.address,
-                "role": user_role.name if user_role else None,
+                "role": user_role.group.name if user_role else None,
                 "dob": user_profile.dob,
                 "experience_in_yrs": user_profile.experience_in_yrs,
                 "profile_photo_url": user_profile.profile_photo_url.url if user_profile.profile_photo_url and hasattr(user_profile.profile_photo_url, 'url') else None,
@@ -140,6 +140,20 @@ class PhoneDirectorySerializer(serializers.ModelSerializer):
 class OTPVerificationSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=15)
     otp = serializers.CharField(max_length=6)
+
+class ForgotPasswordInitiateSerializer(serializers.Serializer):
+    phone = serializers.CharField(max_length=15)
+
+class ResetPasswordSerializer(serializers.Serializer):
+    phone = serializers.CharField(max_length=15)
+    otp = serializers.CharField(max_length=6)
+    new_password = serializers.CharField(min_length=8, write_only=True)
+    confirm_password = serializers.CharField(min_length=8, write_only=True)
+
+    def validate(self, data):
+        if data['new_password'] != data['confirm_password']:
+            raise serializers.ValidationError({"password": "Password fields didn't match."})
+        return data
 
 # Serializer for AreasOfPreparations
 class AreasOfPreparationsSerializer(serializers.ModelSerializer):

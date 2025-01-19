@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from drf_spectacular.utils import extend_schema, extend_schema_view,OpenApiExample
 from .models import UserProfile,UserRole,AreasOfPreparations,UserFieldOfInterests
-from .serializers import UserProfileSerializer,UserRoleSerializer,AreasOfPreparationsSerializer,UserFieldOfInterestsSerializer,PhoneDirectorySerializer, OTPVerificationSerializer, CustomTokenObtainPairSerializer
+from .serializers import UserProfileSerializer,UserRoleSerializer,AreasOfPreparationsSerializer,UserFieldOfInterestsSerializer,PhoneDirectorySerializer, OTPVerificationSerializer, CustomTokenObtainPairSerializer, ForgotPasswordInitiateSerializer, ResetPasswordSerializer
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.decorators import permission_classes
 from rest_framework.views import APIView
@@ -143,6 +143,93 @@ class VerifyOTPView(APIView):
             else:
                 return Response({"detail": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@extend_schema(
+    request=ForgotPasswordInitiateSerializer,
+    responses={
+        200: OpenApiExample(
+            "OTP sent successfully",
+            value={"message": "OTP sent for password reset.", "otp": "123456"},
+            status_codes=["200"]
+        ),
+    }
+)
+class ForgotPasswordInitiateView(APIView):
+    """
+    View to initiate password reset by sending OTP.
+    """
+    def post(self, request):
+        serializer = ForgotPasswordInitiateSerializer(data=request.data)
+        if serializer.is_valid():
+            phone = serializer.validated_data.get('phone')
+            
+            try:
+                phone_directory = PhoneDirectory.objects.get(phone=phone)
+                if not phone_directory.is_verified:
+                    return Response({"detail": "Phone number is not verified."}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # In a real application, generate and send actual OTP
+                # For now, using dummy OTP as in the existing implementation
+                return Response({"message": "OTP sent for password reset.", "otp": "123456"}, status=status.HTTP_200_OK)
+            except PhoneDirectory.DoesNotExist:
+                return Response({"detail": "Phone number not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@extend_schema(
+    request=ResetPasswordSerializer,
+    responses={
+        200: OpenApiExample(
+            "Password reset successful",
+            value={"message": "Password reset successful."},
+            status_codes=["200"]
+        ),
+        400: OpenApiExample(
+            "Invalid OTP or password mismatch",
+            value={"detail": "Invalid OTP or password mismatch."},
+            status_codes=["400"]
+        ),
+        404: OpenApiExample(
+            "Phone number not found",
+            value={"detail": "Phone number not found."},
+            status_codes=["404"]
+        )
+    }
+)
+class ResetPasswordView(APIView):
+    """
+    View to verify OTP and reset password.
+    """
+    def post(self, request):
+        serializer = ResetPasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            phone = serializer.validated_data.get('phone')
+            otp = serializer.validated_data.get('otp')
+            new_password = serializer.validated_data.get('new_password')
+            
+            try:
+                phone_directory = PhoneDirectory.objects.get(phone=phone)
+                if not phone_directory.is_verified:
+                    return Response({"detail": "Phone number is not verified."}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Verify OTP (using dummy OTP for now)
+                if otp != '123456':
+                    return Response({"detail": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Find the user associated with this phone number
+                try:
+                    user_profile = UserProfile.objects.get(phone_directory=phone_directory)
+                    user = user_profile.user
+                    user.set_password(new_password)
+                    user.save()
+                    return Response({"message": "Password reset successful."}, status=status.HTTP_200_OK)
+                except UserProfile.DoesNotExist:
+                    return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+                
+            except PhoneDirectory.DoesNotExist:
+                return Response({"detail": "Phone number not found."}, status=status.HTTP_404_NOT_FOUND)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @extend_schema(
