@@ -238,11 +238,15 @@ class ResetPasswordView(APIView):
 class AreasOfPreparationsViewSet(viewsets.ModelViewSet):
     queryset = AreasOfPreparations.objects.all()
     serializer_class = AreasOfPreparationsSerializer
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save()  # You can add custom logic here if needed
-
+    def get_permissions(self):
+        # Allow unauthenticated access to the `list` action
+        if self.action == 'list':
+            return [AllowAny()]
+        # Require authentication for all other actions
+        return [IsAuthenticated()]
 
 # Viewset for UserFieldOfInterests with drf_spectacular schema extension
 @extend_schema(

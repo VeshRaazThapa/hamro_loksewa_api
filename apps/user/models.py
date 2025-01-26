@@ -46,6 +46,7 @@ class AreasOfPreparations(models.Model):
     name = models.CharField(max_length=255)
     # icon_name = models.CharField(max_length=255)
     icon = models.FileField(upload_to='areas_of_prepration_icon/', null=True, blank=True, default=None)
+    icon_svg = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

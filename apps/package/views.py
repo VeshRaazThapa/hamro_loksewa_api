@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from .models import (
     Province, Association, PackageCategory, PackageSubCategory,
@@ -10,6 +10,7 @@ from .serializers import (
     PackageSubCategorySerializer, PackageSerializer, UserPackageSerializer,
     SubscriptionSerializer, UserSubscriptionSerializer, PaymentSerializer,
 )
+from rest_framework.decorators import permission_classes
 
 @extend_schema_view(
     list=extend_schema(summary="List all provinces", description="Retrieve a list of all provinces."),
@@ -22,8 +23,13 @@ from .serializers import (
 class ProvinceViewSet(viewsets.ModelViewSet):
     queryset = Province.objects.all()
     serializer_class = ProvinceSerializer
-    permission_classes = [IsAuthenticated]
 
+    def get_permissions(self):
+        # Allow unauthenticated access to the `list` action
+        if self.action == 'list':
+            return [AllowAny()]
+        # Require authentication for all other actions
+        return [IsAuthenticated()]
 @extend_schema_view(
     list=extend_schema(summary="List all associations", description="Retrieve a list of all associations."),
     retrieve=extend_schema(summary="Retrieve an association", description="Retrieve a single association by ID."),
@@ -35,8 +41,14 @@ class ProvinceViewSet(viewsets.ModelViewSet):
 class AssociationViewSet(viewsets.ModelViewSet):
     queryset = Association.objects.all()
     serializer_class = AssociationSerializer
-    permission_classes = [IsAuthenticated]
-
+        
+    def get_permissions(self):
+        # Allow unauthenticated access to the `list` action
+        if self.action == 'list':
+            return [AllowAny()]
+        # Require authentication for all other actions
+        return [IsAuthenticated()]
+    
 @extend_schema_view(
     list=extend_schema(summary="List all package categories", description="Retrieve a list of all package categories."),
     retrieve=extend_schema(summary="Retrieve a package category", description="Retrieve a single package category by ID."),

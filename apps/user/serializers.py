@@ -159,7 +159,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 class AreasOfPreparationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = AreasOfPreparations
-        fields = ['id', 'name', 'icon', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'icon','icon_svg', 'created_at', 'updated_at']
 
 # Serializer for UserFieldOfInterests
 class UserFieldOfInterestsSerializer(serializers.ModelSerializer):
