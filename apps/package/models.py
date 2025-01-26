@@ -3,6 +3,8 @@ from django.contrib.postgres.fields import JSONField
 from django.conf import settings
 from django.db import models
 from apps.user.models import AreasOfPreparations
+from django.utils.text import slugify
+import uuid
 class Province(models.Model):
     name = models.CharField(max_length=255, null=False)
 
@@ -53,10 +55,21 @@ class Package(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, related_name='packages')
     association = models.ForeignKey(Association, on_delete=models.SET_NULL, null=True, blank=True, related_name='packages')
+    slug=models.SlugField(null=True, blank=True,unique=True)
 
     def __str__(self):
         return self.title
-
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            # Generate slug from the name, appending a UUID if necessary to ensure uniqueness
+            base_slug = slugify(self.title) if self.title else str(uuid.uuid4())
+            slug = base_slug
+            counter = 1
+            while Package.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
 class UserPackage(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="packages", on_delete=models.CASCADE)

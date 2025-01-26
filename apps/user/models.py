@@ -3,7 +3,8 @@ from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
+from django.utils.text import slugify
+import uuid
 class PhoneDirectory(models.Model):
     phone = models.CharField(max_length=15, null=True, blank=True, unique=True)
     is_verified = models.BooleanField(default=False)
@@ -47,9 +48,20 @@ class AreasOfPreparations(models.Model):
     # icon_name = models.CharField(max_length=255)
     icon = models.FileField(upload_to='areas_of_prepration_icon/', null=True, blank=True, default=None)
     icon_svg = models.TextField(null=True, blank=True)
+    slug=models.SlugField(null=True, blank=True,unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            # Generate slug from the name, appending a UUID if necessary to ensure uniqueness
+            base_slug = slugify(self.name) if self.name else str(uuid.uuid4())
+            slug = base_slug
+            counter = 1
+            while AreasOfPreparations.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
     def __str__(self):
         return self.name
 
