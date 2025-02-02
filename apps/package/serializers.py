@@ -35,7 +35,7 @@ class PackageSerializer(serializers.ModelSerializer):
             'sub_category', 'price', 'discount_price', 'duration_in_months',
             'features', 'description', 'created_at', 'updated_at',
             'province', 'association', 'seo_title', 'seo_description',
-            'seo_twitter_card_type', 'seo_card_image'
+            'seo_twitter_card_type', 'seo_card_image','curriculum'
         ]
 
 class UserPackageSerializer(serializers.ModelSerializer):
@@ -72,6 +72,7 @@ class EbookSerializer(serializers.ModelSerializer):
         model = Ebook
         fields = [
             'id', 'title', 'author', 'description', 'price', 
-            'featured_image', 'file_url', 'package', 
+            'featured_image', 'file_url',  'seo_title', 'seo_description',
+            'seo_twitter_card_type', 'seo_card_image','curriculum',
             'created_at', 'updated_at'
         ]

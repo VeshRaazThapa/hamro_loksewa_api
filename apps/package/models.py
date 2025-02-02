@@ -49,13 +49,14 @@ class Package(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, null=False)
     discount_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     duration_in_months = models.IntegerField(null=False)
-    features = models.JSONField(null=False)  # Requires Django 3.1+
+    features = models.TextField(null=False)  # Requires Django 3.1+
     description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, related_name='packages')
     association = models.ForeignKey(Association, on_delete=models.SET_NULL, null=True, blank=True, related_name='packages')
     slug=models.SlugField(null=True, blank=True,unique=True)
+    curriculum = models.TextField(null=True, blank=True)  # Field to store HTML content
     seo_title = models.CharField(max_length=500, null=True, blank=True)
     seo_description = models.TextField(null=True, blank=True)
     seo_twitter_card_type = models.CharField(max_length=500, null=True, blank=True)
@@ -180,9 +181,14 @@ class Ebook(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     featured_image = models.ImageField(upload_to='ebooks/images/')
     file_url = models.FileField(upload_to='ebooks/files/')
-    package = models.ForeignKey(Package, on_delete=models.CASCADE)
+    # package = models.ForeignKey(Package, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    curriculum = models.TextField(null=True, blank=True)  # Field to store HTML content
+    seo_title = models.CharField(max_length=500, null=True, blank=True)
+    seo_description = models.TextField(null=True, blank=True)
+    seo_twitter_card_type = models.CharField(max_length=500, null=True, blank=True)
+    seo_card_image = models.FileField(upload_to='ebooks/seo/', null=True, blank=True)
 
     class Meta:
         db_table = 'ebooks'

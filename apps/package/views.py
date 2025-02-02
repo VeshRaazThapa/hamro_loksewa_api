@@ -153,8 +153,8 @@ class PaymentViewSet(viewsets.ModelViewSet):
 class EbookViewSet(viewsets.ModelViewSet):
     queryset = Ebook.objects.all()
     serializer_class = EbookSerializer
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
-    filterset_fields = ['package']
+    # filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    # filterset_fields = ['package']
     search_fields = ['title', 'author', 'description']
     ordering_fields = ['created_at', 'updated_at']
 

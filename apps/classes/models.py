@@ -14,7 +14,7 @@ class Classes(models.Model):
     meeting_url = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField()
     schedule = models.DateTimeField(null=True, blank=True)
-    package = models.ForeignKey(Package, on_delete=models.CASCADE)
+    # package = models.ForeignKey(Package, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
