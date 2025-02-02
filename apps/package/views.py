@@ -1,14 +1,16 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import viewsets, permissions, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from .models import (
     Province, Association, PackageCategory, PackageSubCategory,
-    Package, UserPackage, Subscription, UserSubscription, Payment
+    Package, UserPackage, Subscription, UserSubscription, Payment,Ebook
 )
 from .serializers import (
     ProvinceSerializer, AssociationSerializer, PackageCategorySerializer,
     PackageSubCategorySerializer, PackageSerializer, UserPackageSerializer,
-    SubscriptionSerializer, UserSubscriptionSerializer, PaymentSerializer,
+    SubscriptionSerializer, UserSubscriptionSerializer, PaymentSerializer,EbookSerializer
 )
 from rest_framework.decorators import permission_classes
 
@@ -139,3 +141,24 @@ class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     permission_classes = [IsAuthenticated]
+
+@extend_schema_view(
+    list=extend_schema(summary="List all ebooks", description="Retrieve a list of all ebooks."),
+    retrieve=extend_schema(summary="Retrieve a ebook", description="Retrieve a single ebook by ID."),
+    create=extend_schema(summary="Create a new ebook", description="Create a new ebook entry."),
+    update=extend_schema(summary="Update a ebook", description="Update an existing ebook."),
+    partial_update=extend_schema(summary="Partially update a ebook", description="Partially update a payment entry."),
+    destroy=extend_schema(summary="Delete a ebook", description="Delete a ebook entry."),
+)
+class EbookViewSet(viewsets.ModelViewSet):
+    queryset = Ebook.objects.all()
+    serializer_class = EbookSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ['package']
+    search_fields = ['title', 'author', 'description']
+    ordering_fields = ['created_at', 'updated_at']
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]

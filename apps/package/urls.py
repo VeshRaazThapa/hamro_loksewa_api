@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     ProvinceViewSet, AssociationViewSet, PackageCategoryViewSet,
     PackageSubCategoryViewSet, PackageViewSet, UserPackageViewSet,
-    SubscriptionViewSet, UserSubscriptionViewSet, PaymentViewSet,
+    SubscriptionViewSet, UserSubscriptionViewSet, PaymentViewSet,EbookViewSet
 )
 
 router = DefaultRouter()
@@ -16,6 +16,7 @@ router.register(r'user-packages', UserPackageViewSet)
 router.register(r'subscriptions', SubscriptionViewSet)
 router.register(r'user-subscriptions', UserSubscriptionViewSet)
 router.register(r'payments', PaymentViewSet)
+router.register(r'ebooks', EbookViewSet)
 
 package_urlpatterns = [
     path('', include(router.urls)),

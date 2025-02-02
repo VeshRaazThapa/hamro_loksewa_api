@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 INNER_APPS = [
     'apps.user',
     'apps.package',
+    'apps.classes'
 ]
 
 THIRD_PARTY_APPS = [
@@ -55,6 +56,7 @@ THIRD_PARTY_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
         'corsheaders',
+            'django_filters',
 
 ]
 

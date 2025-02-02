@@ -1,10 +1,9 @@
 from rest_framework import serializers
 from .models import (
     Province, Association, PackageCategory, PackageSubCategory,
-    Package, UserPackage, Subscription, UserSubscription, Payment,
+    Package, UserPackage, Subscription, UserSubscription, Payment, Ebook
 )
 from django.contrib.auth.models import User, Group
-from django.contrib.auth import get_user_model
 
 
 # Serializer for AreasOfPreparations
@@ -35,7 +34,8 @@ class PackageSerializer(serializers.ModelSerializer):
             'id', 'title', 'areas_of_preparation', 'category', 
             'sub_category', 'price', 'discount_price', 'duration_in_months',
             'features', 'description', 'created_at', 'updated_at',
-            'province', 'association'
+            'province', 'association', 'seo_title', 'seo_description',
+            'seo_twitter_card_type', 'seo_card_image'
         ]
 
 class UserPackageSerializer(serializers.ModelSerializer):
@@ -65,7 +65,13 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
+        fields = '__all__'
+
+class EbookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ebook
         fields = [
-            'id', 'user', 'status', 'method', 'created_at',
-            'updated_at', 'package_id', 'subscription_id'
+            'id', 'title', 'author', 'description', 'price', 
+            'featured_image', 'file_url', 'package', 
+            'created_at', 'updated_at'
         ]
