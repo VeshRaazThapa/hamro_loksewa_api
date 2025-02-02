@@ -35,7 +35,6 @@ class UserProfile(models.Model):
     )
     address = models.CharField(max_length=255, null=True, blank=True)
     dob = models.DateTimeField(null=True, blank=True)
-    experience_in_yrs = models.PositiveIntegerField(null=True, blank=True)
     profile_photo_url = models.ImageField(upload_to="user/profile/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

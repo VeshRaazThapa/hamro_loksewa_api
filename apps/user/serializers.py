@@ -39,7 +39,6 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
                 "address": user_profile.address,
                 "role": user_role.group.name if user_role else None,
                 "dob": user_profile.dob,
-                "experience_in_yrs": user_profile.experience_in_yrs,
                 "profile_photo_url": user_profile.profile_photo_url.url if user_profile.profile_photo_url and hasattr(user_profile.profile_photo_url, 'url') else None,
                 "created_at": user_profile.created_at,
                 "updated_at": user_profile.updated_at,
