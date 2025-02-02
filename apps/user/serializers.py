@@ -17,7 +17,9 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
         phone = attrs.get("phone")
         password = attrs.get("password")
 
-
+        phone_directory=PhoneDirectory.objects.get(phone=phone)
+        if phone_directory and not phone_directory.is_verified:
+            raise serializers.ValidationError("User phone number is not verified")
         user = authenticate(phone=phone, password=password)
 
         try:
@@ -44,6 +46,9 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
             }
         except UserProfile.DoesNotExist:
             user_profile_data = {}
+        except serializers.ValidationError as e:
+            # Catch specific validation errors like unverified phone
+            raise serializers.ValidationError(e.detail)
         response_data={}
         # Add user profile data to the response
         response_data["user_profile"] = user_profile_data
@@ -69,6 +74,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     areas_of_preparation = serializers.ListField(child=serializers.IntegerField(), write_only=True,required=False)
+    phone_number = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = UserProfile
@@ -78,13 +84,19 @@ class UserProfileSerializer(serializers.ModelSerializer):
         user_data = validated_data.pop('user')
         phone_directory = validated_data.get('phone_directory')
         areas_of_preparation_ids = validated_data.pop('areas_of_preparation', [])
-
+        phone_number = validated_data.pop('phone_number', None)
+        
         # If phone_directory is provided, extract the username from it
         if phone_directory:
             username_from_phone = phone_directory.phone
 
             # Update user_data to include the username from phone directory
             user_data['username'] = username_from_phone
+        # Insert phone number into PhoneDirectory if provided
+        if phone_number and not phone_directory:
+            phone_directory = PhoneDirectory.objects.get_or_create(phone=phone_number)
+            validated_data['phone_directory'] = phone_directory[0]  # Add to validated_data
+            user_data['username'] = phone_directory[0].phone  # Use phone number as username
 
         # Create the user using the updated user_data
         user = UserSerializer().create(user_data)
