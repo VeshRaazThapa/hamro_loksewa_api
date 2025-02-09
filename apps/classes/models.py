@@ -1,5 +1,3 @@
-import os
-from django.conf import settings
 from django.db import models
 from apps.package.models import Package, AreasOfPreparations
 from django.utils.translation import gettext_lazy as _

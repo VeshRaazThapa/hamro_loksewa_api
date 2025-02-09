@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.postgres.fields import JSONField
 from django.conf import settings
 from django.db import models
 from apps.user.models import AreasOfPreparations
@@ -104,21 +103,12 @@ class UserPackage(models.Model):
         super().save(*args, **kwargs)
 
 class Subscription(models.Model):
-    BASIC = 'basic'
-    ADVANCED = 'advanced'
-    PREMIUM = 'premium'
 
-    SUBSCRIPTION_CHOICES = [
-        (BASIC, 'Basic'),
-        (ADVANCED, 'Advanced'),
-        (PREMIUM, 'Premium'),
-    ]
-
-    name = models.CharField(max_length=10, choices=SUBSCRIPTION_CHOICES, null=False)
+    name = models.CharField(max_length=10, null=False)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=False)
     discount_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     duration_in_months = models.IntegerField(null=False)
-    features = models.JSONField(null=False)  # Requires Django 3.1+
+    features = models.TextField(null=False)  # Requires Django 3.1+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
