@@ -5,14 +5,17 @@ from rest_framework import viewsets, permissions, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import (
     Province, Association, PackageCategory, PackageSubCategory,
-    Package, UserPackage, Subscription, UserSubscription, Payment,Ebook
+    Package, UserPackage, Subscription, UserSubscription, Payment,Ebook,EbookPackage
 )
 from .serializers import (
     ProvinceSerializer, AssociationSerializer, PackageCategorySerializer,
     PackageSubCategorySerializer, PackageSerializer, UserPackageSerializer,
     SubscriptionSerializer, UserSubscriptionSerializer, PaymentSerializer,EbookSerializer
 )
-from rest_framework.decorators import permission_classes
+from apps.classes.models import ClassPackage,Classes
+from rest_framework.response import Response
+from rest_framework import status
+
 
 @extend_schema_view(
     list=extend_schema(summary="List all provinces", description="Retrieve a list of all provinces."),
@@ -22,6 +25,7 @@ from rest_framework.decorators import permission_classes
     partial_update=extend_schema(summary="Partially update a province", description="Partially update a province entry."),
     destroy=extend_schema(summary="Delete a province", description="Delete a province entry."),
 )
+
 class ProvinceViewSet(viewsets.ModelViewSet):
     queryset = Province.objects.all()
     serializer_class = ProvinceSerializer
@@ -88,7 +92,67 @@ class PackageSubCategoryViewSet(viewsets.ModelViewSet):
 class PackageViewSet(viewsets.ModelViewSet):
     queryset = Package.objects.all()
     serializer_class = PackageSerializer
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        # Allow unauthenticated access to the `list` action
+        if self.action == 'list':
+            return [AllowAny()]
+        # Require authentication for all other actions
+        return [IsAuthenticated()]
+
+    def create(self, request, *args, **kwargs):
+        selected_ebook_ids = request.data.pop('ebooks', [])  # List of ebook IDs
+        selected_class_ids = request.data.pop('classes', [])  # List of class IDs
+        
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        package = serializer.save()
+        
+        # Fetch and associate ebooks
+        valid_ebooks = Ebook.objects.filter(id__in=selected_ebook_ids)
+        for ebook in valid_ebooks:
+            EbookPackage.objects.create(package=package, ebook=ebook)
+        
+        # Fetch and associate classes
+        valid_classes = Classes.objects.filter(id__in=selected_class_ids)
+        for class_instance in valid_classes:
+            ClassPackage.objects.create(package=package, class_id=class_instance)
+
+        # Fetch province and association names
+        province_name = package.province.name if package.province else None
+        association_name = package.association.name if package.association else None
+
+        # Fetch list of associated ebooks and classes
+        added_ebooks = list(valid_ebooks.values('id','title'))  # Include ID and title
+        added_classes = list(valid_classes.values('id','title'))  # Include ID and name
+
+        response_data = serializer.data
+        response_data.update({
+            'province_name': province_name,
+            'association_name': association_name,
+            'ebooks': added_ebooks,
+            'classes': added_classes
+        })
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+    
+    def get_queryset(self):
+        queryset = Package.objects.all()
+        province = self.request.query_params.get('province')
+        association = self.request.query_params.get('association')
+        province_ids = self.request.query_params.getlist('province_id')
+        association_ids = self.request.query_params.getlist('association_id')
+        
+        if province:
+            queryset = queryset.filter(province__isnull=False)
+        if association:
+            queryset = queryset.filter(association__isnull=False)
+        if province_ids:
+            queryset = queryset.filter(province__id__in=province_ids)
+        if association_ids:
+            queryset = queryset.filter(association__id__in=association_ids)
+        
+        return queryset
+
 
 @extend_schema_view(
     list=extend_schema(summary="List all user packages", description="Retrieve a list of all user packages."),

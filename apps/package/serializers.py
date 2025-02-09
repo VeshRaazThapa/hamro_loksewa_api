@@ -28,6 +28,9 @@ class PackageSubCategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'created_at', 'updated_at']
 
 class PackageSerializer(serializers.ModelSerializer):
+    ebooks = serializers.ListField(child=serializers.IntegerField(), write_only=True,required=False, allow_null=True)
+    classes = serializers.ListField(child=serializers.IntegerField(), write_only=True,required=False, allow_null=True)
+
     class Meta:
         model = Package
         fields = [
@@ -35,7 +38,7 @@ class PackageSerializer(serializers.ModelSerializer):
             'sub_category', 'price', 'discount_price', 'duration_in_months',
             'features', 'description', 'created_at', 'updated_at',
             'province', 'association', 'seo_title', 'seo_description',
-            'seo_twitter_card_type', 'seo_card_image','curriculum'
+            'seo_twitter_card_type', 'seo_card_image','curriculum','ebooks','classes'
         ]
 
 class UserPackageSerializer(serializers.ModelSerializer):
@@ -73,6 +76,6 @@ class EbookSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'author', 'description', 'price', 
             'featured_image', 'file_url',  'seo_title', 'seo_description',
-            'seo_twitter_card_type', 'seo_card_image','curriculum',
+            'seo_twitter_card_type', 'seo_card_image','curriculum','status',
             'created_at', 'updated_at'
         ]

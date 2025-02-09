@@ -3,18 +3,25 @@ from django.conf import settings
 from django.db import models
 from apps.package.models import Package, AreasOfPreparations
 from django.utils.translation import gettext_lazy as _
-
+# naming plural here cause singular one is reserved keyword
 class Classes(models.Model):
     TYPE_CHOICES = (
         ('live', 'Live'),
         ('recorded', 'Recorded'),
     )
+    PUBLISHED = 'published'
+    DRAFT = 'draft'
+
+    STATUS_CHOICES = [
+        (PUBLISHED, 'Published'),
+        (DRAFT, 'Draft'),
+    ]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=DRAFT)
     title = models.CharField(max_length=255)
     type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     meeting_url = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField()
     schedule = models.DateTimeField(null=True, blank=True)
-    # package = models.ForeignKey(Package, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -29,11 +36,19 @@ class Classes(models.Model):
     def save(self, *args, **kwargs):
         self.updated_at = models.DateTimeField(auto_now=True)
         super().save(*args, **kwargs)
+class ClassPackage(models.Model):
+    package = models.ForeignKey(Package, on_delete=models.CASCADE)
+    class_id = models.ForeignKey(Classes, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        self.updated_at = models.DateTimeField(auto_now=True)
+        super().save(*args, **kwargs)
 class Instructor(models.Model):
     name = models.CharField(max_length=255)
     profile_image_url = models.ImageField(upload_to='instructor/profile/')
-    teaching_area = models.ForeignKey(AreasOfPreparations, on_delete=models.CASCADE)
+    teaching_area = models.ForeignKey(AreasOfPreparations, on_delete=models.SET_NULL,null=True,blank=True)
     years_of_experience = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

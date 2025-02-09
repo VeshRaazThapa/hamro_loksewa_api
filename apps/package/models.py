@@ -7,17 +7,25 @@ from django.utils.text import slugify
 import uuid
 class Province(models.Model):
     name = models.CharField(max_length=255, null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
-
+    def save(self, *args, **kwargs):
+        self.updated_at = models.DateTimeField(auto_now=True)
+        super().save(*args, **kwargs)
 # kendra or sangha
 class Association(models.Model):
     name = models.CharField(max_length=255, null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
-
+    def save(self, *args, **kwargs):
+        self.updated_at = models.DateTimeField(auto_now=True)
+        super().save(*args, **kwargs)
 # Examples: 'Physics', 'Chemistry'
 class PackageCategory(models.Model):
     name = models.CharField(max_length=255, null=True)  
@@ -26,7 +34,9 @@ class PackageCategory(models.Model):
 
     def __str__(self):
         return self.name
-
+    def save(self, *args, **kwargs):
+        self.updated_at = models.DateTimeField(auto_now=True)
+        super().save(*args, **kwargs)
 # Examples: 'Primary', 'Secondary'
 class PackageSubCategory(models.Model):
     name = models.CharField(max_length=255, null=True)  
@@ -35,7 +45,9 @@ class PackageSubCategory(models.Model):
 
     def __str__(self):
         return self.name
-
+    def save(self, *args, **kwargs):
+        self.updated_at = models.DateTimeField(auto_now=True)
+        super().save(*args, **kwargs)
 
 class Package(models.Model):
     title = models.CharField(max_length=255, null=False)
@@ -45,7 +57,7 @@ class Package(models.Model):
             on_delete=models.CASCADE
     )    
     category = models.ForeignKey(PackageCategory, on_delete=models.CASCADE, related_name='packages')
-    sub_category = models.ForeignKey(PackageSubCategory, on_delete=models.CASCADE, related_name='packages')
+    sub_category = models.ForeignKey(PackageSubCategory, on_delete=models.CASCADE, related_name='packages',blank=True,null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=False)
     discount_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     duration_in_months = models.IntegerField(null=False)
@@ -65,6 +77,7 @@ class Package(models.Model):
     def __str__(self):
         return self.title
     def save(self, *args, **kwargs):
+        self.updated_at = models.DateTimeField(auto_now=True)
         if not self.slug:
             # Generate slug from the name, appending a UUID if necessary to ensure uniqueness
             base_slug = slugify(self.title) if self.title else str(uuid.uuid4())
@@ -75,7 +88,7 @@ class Package(models.Model):
                 counter += 1
             self.slug = slug
         super().save(*args, **kwargs)
-
+    
 class UserPackage(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="packages", on_delete=models.CASCADE)
     package = models.ForeignKey(Package, on_delete=models.CASCADE, related_name='user_packages')
@@ -86,6 +99,9 @@ class UserPackage(models.Model):
 
     def __str__(self):
         return f"User {self.user_id} - Package {self.package.title}"
+    def save(self, *args, **kwargs):
+        self.updated_at = models.DateTimeField(auto_now=True)
+        super().save(*args, **kwargs)
 
 class Subscription(models.Model):
     BASIC = 'basic'
@@ -108,6 +124,9 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f"{self.name.capitalize()} Subscription"
+    def save(self, *args, **kwargs):
+        self.updated_at = models.DateTimeField(auto_now=True)
+        super().save(*args, **kwargs)
 
 
 class UserSubscription(models.Model):
@@ -131,6 +150,9 @@ class UserSubscription(models.Model):
 
     def __str__(self):
         return f"User {self.user_id} - {self.subscription_type.name.capitalize()} Subscription"
+    def save(self, *args, **kwargs):
+        self.updated_at = models.DateTimeField(auto_now=True)
+        super().save(*args, **kwargs)
 
 
 class Payment(models.Model):
@@ -172,16 +194,28 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment {self.id} - Status: {self.status.capitalize()}"
+    def save(self, *args, **kwargs):
+        self.updated_at = models.DateTimeField(auto_now=True)
+        super().save(*args, **kwargs)
 
 
 class Ebook(models.Model):
+
+    PUBLISHED = 'published'
+    DRAFT = 'draft'
+
+    STATUS_CHOICES = [
+        (PUBLISHED, 'Published'),
+        (DRAFT, 'Draft'),
+    ]
+
     title = models.CharField(max_length=255)
     author = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     featured_image = models.ImageField(upload_to='ebooks/images/')
     file_url = models.FileField(upload_to='ebooks/files/')
-    # package = models.ForeignKey(Package, on_delete=models.CASCADE)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=DRAFT)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     curriculum = models.TextField(null=True, blank=True)  # Field to store HTML content
@@ -189,6 +223,8 @@ class Ebook(models.Model):
     seo_description = models.TextField(null=True, blank=True)
     seo_twitter_card_type = models.CharField(max_length=500, null=True, blank=True)
     seo_card_image = models.FileField(upload_to='ebooks/seo/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'ebooks'
@@ -198,3 +234,16 @@ class Ebook(models.Model):
 
     def __str__(self):
         return self.title
+    def save(self, *args, **kwargs):
+        self.updated_at = models.DateTimeField(auto_now=True)
+        super().save(*args, **kwargs)
+
+class EbookPackage(models.Model):
+    package = models.ForeignKey(Package, on_delete=models.CASCADE)
+    ebook = models.ForeignKey(Ebook, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        self.updated_at = models.DateTimeField(auto_now=True)
+        super().save(*args, **kwargs)
