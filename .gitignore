@@ -24,3 +24,4 @@ pythonenv*
 media/
 static/webpack_bundles
 static/webpack-stats.json
+db.sqlite3

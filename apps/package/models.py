@@ -206,6 +206,8 @@ class Ebook(models.Model):
     featured_image = models.ImageField(upload_to='ebooks/images/')
     file_url = models.FileField(upload_to='ebooks/files/')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=DRAFT)
+    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, related_name='ebooks')
+    association = models.ForeignKey(Association, on_delete=models.SET_NULL, null=True, blank=True, related_name='ebooks')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     curriculum = models.TextField(null=True, blank=True)  # Field to store HTML content

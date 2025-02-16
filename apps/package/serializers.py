@@ -74,7 +74,7 @@ class EbookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ebook
         fields = [
-            'id', 'title', 'author', 'description', 'price', 
+            'id', 'title', 'author', 'description', 'price', 'province','association',
             'featured_image', 'file_url',  'seo_title', 'seo_description',
             'seo_twitter_card_type', 'seo_card_image','curriculum','status',
             'created_at', 'updated_at'
