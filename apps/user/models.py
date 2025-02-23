@@ -23,7 +23,7 @@ class UserProfile(models.Model):
         related_name="profile",
         on_delete=models.CASCADE
     )
-    full_name = models.CharField(max_length=100, null=True, blank=True)
+    full_name = models.CharField(max_length=500, null=True, blank=True)
     gender = models.CharField(
         max_length=100, choices=GENDER_CHOICES, null=True, blank=True
     )
@@ -33,7 +33,7 @@ class UserProfile(models.Model):
         on_delete=models.SET_NULL,
         null=True,blank=True
     )
-    address = models.CharField(max_length=255, null=True, blank=True)
+    address = models.CharField(max_length=500, null=True, blank=True)
     dob = models.DateTimeField(null=True, blank=True)
     profile_photo_url = models.ImageField(upload_to="user/profile/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -43,7 +43,7 @@ class UserProfile(models.Model):
         return self.user.username
     
 class AreasOfPreparations(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=500)
     # icon_name = models.CharField(max_length=255)
     icon = models.FileField(upload_to='areas_of_prepration_icon/', null=True, blank=True, default=None)
     icon_svg = models.TextField(null=True, blank=True)

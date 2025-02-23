@@ -49,7 +49,7 @@ class PackageSubCategory(models.Model):
         super().save(*args, **kwargs)
 
 class Package(models.Model):
-    title = models.CharField(max_length=255, null=False)
+    title = models.CharField(max_length=500, null=False)
     areas_of_preparation = models.ForeignKey(
             AreasOfPreparations,
             related_name="packages",
@@ -104,9 +104,9 @@ class UserPackage(models.Model):
 
 class Subscription(models.Model):
 
-    name = models.CharField(max_length=10, null=False)
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=False)
-    discount_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    name = models.CharField(max_length=500, null=False)
+    price = models.DecimalField(max_digits=100, decimal_places=2, null=False)
+    discount_price = models.DecimalField(max_digits=100, decimal_places=2, null=True, blank=True)
     duration_in_months = models.IntegerField(null=False)
     features = models.TextField(null=False)  # Requires Django 3.1+
     created_at = models.DateTimeField(auto_now_add=True)
@@ -133,7 +133,7 @@ class UserSubscription(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="subscriptions", on_delete=models.CASCADE)
     subscription_type = models.ForeignKey(Subscription, on_delete=models.CASCADE, related_name='user_subscriptions')
     payment_id = models.IntegerField()  # Replace with ForeignKey if related table exists
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=ACTIVE)
+    status = models.CharField(max_length=100, choices=STATUS_CHOICES, default=ACTIVE)
     expiry_at = models.DateTimeField(null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -165,8 +165,8 @@ class Payment(models.Model):
     ]
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="payments", on_delete=models.CASCADE)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=PENDING)
-    method = models.CharField(max_length=10, choices=METHOD_CHOICES, null=False)
+    status = models.CharField(max_length=100, choices=STATUS_CHOICES, default=PENDING)
+    method = models.CharField(max_length=100, choices=METHOD_CHOICES, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
